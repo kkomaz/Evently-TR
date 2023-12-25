@@ -8,7 +8,7 @@ import Order from '@/lib/database/models/order.model';
 import Event from '@/lib/database/models/event.model';
 import { handleError } from '@/lib/utils';
 
-import { CreateUserParams, UpdateUserParams } from '@/types';
+import { CreateUserParams, UpdateUserParams } from '@/lib/actions/user.types';
 
 export const createUser = async (user: CreateUserParams) => {
   try {
