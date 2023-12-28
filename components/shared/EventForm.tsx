@@ -1,5 +1,5 @@
 'use client';
-
+import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { eventFormSchema } from '@/lib/validator';
@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -17,6 +16,8 @@ import { Input } from '@/components/ui/input';
 import * as z from 'zod';
 import { eventDefaultValues } from '@/constants';
 import Dropdown from '../ui/Dropdown';
+import { Textarea } from '../ui/textarea';
+import FileUploader from './FileUploader';
 
 type EventFormProps = {
   userId: string;
@@ -25,12 +26,18 @@ type EventFormProps = {
 
 const EventForm = ({ userId, type }: EventFormProps) => {
   const initialValues = eventDefaultValues;
+  const [files, setFiles] = useState<File[]>([]);
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof eventFormSchema>>({
     resolver: zodResolver(eventFormSchema),
     defaultValues: initialValues,
   });
+
+  function onError(error: any) {
+    console.log(form.formState);
+    console.log(error);
+  }
 
   // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof eventFormSchema>) {
@@ -43,7 +50,7 @@ const EventForm = ({ userId, type }: EventFormProps) => {
     <div>
       <Form {...form}>
         <form
-          onSubmit={form.handleSubmit(onSubmit)}
+          onSubmit={form.handleSubmit(onSubmit, onError)}
           className="flex flex-col gap-5"
         >
           <div className="flex flex-col gap-5 md:flex-row">
@@ -75,6 +82,38 @@ const EventForm = ({ userId, type }: EventFormProps) => {
                     />
                   </FormControl>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="flex flex-col gap-5 md:flex-row">
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormControl className="h-72">
+                    <Textarea
+                      placeholder="Description"
+                      {...field}
+                      className="textarea rounded-2xl"
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="imageUrl"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormControl className="h-72">
+                    <FileUploader
+                      onFieldChange={field.onChange}
+                      imageUrl={field.value}
+                      setFiles={setFiles}
+                    />
+                  </FormControl>
                 </FormItem>
               )}
             />
